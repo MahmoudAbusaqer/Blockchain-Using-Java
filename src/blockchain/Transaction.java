@@ -13,12 +13,13 @@ public class Transaction {
 
     private String transaction;
     private String transactionHash;
-    private Mempool mempool = new Mempool();
+    Mempool mempool = Mempool.getInstance();
 
     public Transaction(String transaction) throws NoSuchAlgorithmException {
         this.transaction = transaction;
         this.transactionHash = calculateHash(transaction);
-        mempool.addToMempool(this);
+//        mempool = Mempool.getInstance();
+        this.mempool.addToMempool(this);
     }
 
     public String getTransaction() {
@@ -44,7 +45,5 @@ public class Transaction {
     public String toString() {
         return "Transaction{" + "transaction=" + transaction + ", transactionHash=" + transactionHash + '}';
     }
-    
-    
 
 }

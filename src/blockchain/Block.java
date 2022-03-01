@@ -18,57 +18,9 @@ public class Block {
 
     private TreeSet<String> merkleTree;
 
-    class Header {
+    
 
-        //Block Header
-        private int version;
-        private String previousHash;
-        private String merkleRoot;
-        private Long timestamp;
-        private int difficulty;
-        private int nonce;
-
-        public Header(int version, String previousHash, int difficulty) {
-            this.version = version;
-            this.previousHash = previousHash;//need to be the last block hash
-//            this.merkleRoot = getMerkleRoot();
-            this.timestamp = System.currentTimeMillis();
-            this.difficulty = difficulty;//need to add the formula
-            this.nonce = 0;
-        }
-
-        @Override
-        public String toString() {
-            return "Header{" + "version=" + version + ", previousHash=" + previousHash + ", merkleRoot=" + merkleRoot + ", timestamp=" + timestamp + ", difficulty=" + difficulty + ", nonce=" + nonce + '}';
-        }
-
-        public String getPreviousHash() {
-            return previousHash;
-        }
-
-        public void setPreviousHash(String previousHash) {
-            this.previousHash = previousHash;
-        }
-
-        public int getNonce() {
-            return nonce;
-        }
-
-        public void setNonce(int nonce) {
-            this.nonce = nonce;
-        }
-
-        public int getDifficulty() {
-            return difficulty;
-        }
-
-        public void setMerkleRoot(String merkleRoot) {
-            this.merkleRoot = merkleRoot;
-        }
-
-    }
-
-    private static int index;
+    private int index;
     private Header header;
     private int transactionCounter;
     private List<Transaction> transactions;
@@ -78,57 +30,69 @@ public class Block {
         this.index = index;
         this.transactions = new ArrayList<>(transactions);
         this.transactionCounter = this.transactions.size();
-        MerkleTree();
+//        System.out.println("before the call of the merkle tree");
+//        MerkleTree();
+
         this.header = header;
-        this.header.setMerkleRoot(getMerkleRoot());
+//        System.out.println("** after the call header object");
+//        System.out.println(this.header.toString());
+//        this.header.setMerkleRoot(getMerkleRoot());
 //        blockHash = calculateHash(this.toString());
     }
 
     public void MerkleTree() throws NoSuchAlgorithmException {
         merkleTree = new TreeSet<>();
+//        System.out.println(merkleTree.toString());
         for (int i = 0; i < transactions.size(); i++) {
             merkleTree.add(transactions.get(i).getTransactionHash());
         }
         LinkedList<String> temp = new LinkedList<>(merkleTree);
         LinkedList<String> temp2 = new LinkedList<>();
-        System.out.println(merkleTree.toString());
+//        System.out.println(merkleTree.toString());
         int i = 0;
         while (temp.size() != 1) {
             int tempSize = temp.size();
-            System.out.println("$$tempSize= " + tempSize);
+//            System.out.println("$$tempSize= " + tempSize);
             String newHash = null;
 
             if (!temp.isEmpty()) {
                 if ((i + 1) % 2 != 0 && i + 1 < tempSize) {
                     String newString = temp.get(i) + temp.get(i + 1);
                     newHash = calculateHash(newString);
-                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i + 1));
+//                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i + 1));
                 } else {
                     String newString = temp.get(i) + temp.get(i);
                     newHash = calculateHash(newString);
-                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i));
+//                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i));
                 }
-            }else{
+            } else {
                 break;
             }
 
             merkleTree.add(newHash);
             temp2.add(newHash);
             if (tempSize <= i + 2) {
-                System.out.println("temp = " + temp.toString());
+//                System.out.println("temp = " + temp.toString());
                 temp = (LinkedList<String>) temp2.clone();
-                System.out.println("temp = " + temp.toString());
+//                System.out.println("temp = " + temp.toString());
                 temp2.clear();
                 i = 0;
             } else {
                 i += 2;
             }
         }
-        System.out.println(merkleTree.toString());
+//        System.out.println(merkleTree.toString());
+
     }
 
-    private String getMerkleRoot() {
-        return merkleTree.last();
+    public void setMerkleRoot() {
+        this.header.setMerkleRoot(merkleTree.last());
+//        if (merkleTree.last() != null) {
+//            return merkleTree.last();
+//        } else {
+//            return "";
+//        }
+
     }
 
     public String calculateHash(String string) throws NoSuchAlgorithmException {
@@ -152,6 +116,10 @@ public class Block {
 
     public void setBlockHash(String blockHash) {
         this.blockHash = blockHash;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
     @Override

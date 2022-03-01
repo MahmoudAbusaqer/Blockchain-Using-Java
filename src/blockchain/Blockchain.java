@@ -3,6 +3,7 @@ package blockchain;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -11,8 +12,8 @@ import java.util.List;
 public class Blockchain {
 
 //    private static Blockchain blockchain;
-    private Mempool mempool = new Mempool();
-    private final List<Block> chain = new LinkedList<>();
+    private Mempool mempool = Mempool.getInstance();
+    private List<Block> chain = new LinkedList<>();
     private int difficulty = 2;
 
     public Blockchain() throws NoSuchAlgorithmException {
@@ -50,45 +51,75 @@ public class Blockchain {
             return false;
         }
         block.setBlockHash(powHash);
-        this.chain.add(block);
+        z("powHash= " + powHash);
+        z("added to chain:::::" + this.chain.add(block));
         return true;
     }
 
+//    public void x(Block block) {
+//        System.out.println("block.getHeader().getNonce()" + block.getHeader().getNonce());
+//    }
     //The algorithm of finding the hash taha match with the difficulty target
     public String proofOfWork(Block block) throws NoSuchAlgorithmException {
+//        x(block);
+//y(block);
         int nonce = block.getHeader().getNonce();
         String computBlockHash = block.calculateHash(block.toString());
-        while (!computBlockHash.startsWith("0", block.getHeader().getDifficulty())) {
+        while (true) {
+            if (computBlockHash.substring(0, 2).equals("00")) {
+                break;
+            }
+//            while (!computBlockHash.startsWith("0", block.getHeader().getDifficulty())) {
             block.getHeader().setNonce(++nonce);
             computBlockHash = block.calculateHash(block.toString());
+
         }
         return computBlockHash;
+    }
+
+    public void y(Block block) {
+        System.out.println("block= " + block.toString());
+    }
+
+    public void z(String s) {
+        System.out.println(s);
     }
 
     //Mining a new block
     public boolean mineBlock() throws NoSuchAlgorithmException {
         if (mempool.getUnconfirmedTransactions().isEmpty()) {
+            z("1");
             return false;
         }
-
+        z("**1");
         Block block = null;
         if (chain.isEmpty()) {
-            Block.Header header = null;
-            try {
-                header = block.new Header(1, "0", this.difficulty);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            z("2");
+            Header header = new Header(1, "0", this.difficulty);
+//            try {
+//                header = block.new Header(1, "0", this.difficulty);
+////                y(block);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
 
             block = new Block(this.chain.size(), header, mempool.getUnconfirmedTransactions());
+            block.MerkleTree();
+
         } else {
+            z("3");
             Block lastBlock = getLastBlockInChain();
-            Block.Header header = block.new Header(1, lastBlock.getBlockHash(), this.difficulty);
+            Header header = new Header(1, lastBlock.getBlockHash(), this.difficulty);
             block = new Block(this.chain.size(), header, mempool.getUnconfirmedTransactions());
+            block.MerkleTree();
+//            y(block);
         }
-
+        z("4");
         String pow = proofOfWork(block);
-        addToChain(block, pow);
+        z("addToChain " + addToChain(block, pow));
+        z("pow" + pow);
+        mempool.removeAllFromMempool(block.getTransactions());
+        y(block);
         return true;
     }
 
@@ -119,14 +150,19 @@ public class Blockchain {
     }
 
     //Add a new transaction
-    public void addTransaction(Transaction transaction) {
-        mempool.addToMempool(transaction);
+    public boolean addTransaction(Transaction transaction) {
+        return mempool.addToMempool(transaction);
     }
 
     //Create the first block in the blockchain
     private void createGenesisBlock() throws NoSuchAlgorithmException {
-        addTransaction(new Transaction("Send 100 MAS coin to Mahmoud Abusaqer"));
-        mineBlock();
+        System.out.println(addTransaction(new Transaction("Send 100 MAS coin to Mahmoud Abusaqer")));
+//        addTransaction(new Transaction("Send 100 MAS coin to Mahmoud Abusaqer"));
+//        System.out.println("mempool: " + mempool.getUnconfirmedTransactions().toString());
+        System.out.println(mineBlock());
+//        mineBlock();
+        System.out.println("inside the createGenesisBlock");
+        System.out.println("mempool: " + mempool.getUnconfirmedTransactions().toString());
 //        Block block = null;
 //        Block.Header header = block.new Header(0, "0", 0);
 //        block = new Block(header, mempool.getUnconfirmedTransactions());
