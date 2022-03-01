@@ -30,10 +30,10 @@ public class Block {
 
         public Header(int version, String previousHash, int difficulty) {
             this.version = version;
-            this.previousHash = previousHash;
-            this.merkleRoot = getMerkleRoot();
+            this.previousHash = previousHash;//need to be the last block hash
+//            this.merkleRoot = getMerkleRoot();
             this.timestamp = System.currentTimeMillis();
-            this.difficulty = difficulty;
+            this.difficulty = difficulty;//need to add the formula
             this.nonce = 0;
         }
 
@@ -42,21 +42,46 @@ public class Block {
             return "Header{" + "version=" + version + ", previousHash=" + previousHash + ", merkleRoot=" + merkleRoot + ", timestamp=" + timestamp + ", difficulty=" + difficulty + ", nonce=" + nonce + '}';
         }
 
+        public String getPreviousHash() {
+            return previousHash;
+        }
+
+        public void setPreviousHash(String previousHash) {
+            this.previousHash = previousHash;
+        }
+
+        public int getNonce() {
+            return nonce;
+        }
+
+        public void setNonce(int nonce) {
+            this.nonce = nonce;
+        }
+
+        public int getDifficulty() {
+            return difficulty;
+        }
+
+        public void setMerkleRoot(String merkleRoot) {
+            this.merkleRoot = merkleRoot;
+        }
+
     }
 
-    private static int index = 0;
+    private static int index;
     private Header header;
     private int transactionCounter;
     private List<Transaction> transactions;
     private String blockHash;
 
-    public Block(Header header, Set<Transaction> transactions) throws NoSuchAlgorithmException {
-        this.index++;
+    public Block(int index, Header header, Set<Transaction> transactions) throws NoSuchAlgorithmException {
+        this.index = index;
         this.transactions = new ArrayList<>(transactions);
         this.transactionCounter = this.transactions.size();
         MerkleTree();
         this.header = header;
-        blockHash = calculateHash(this.toString());
+        this.header.setMerkleRoot(getMerkleRoot());
+//        blockHash = calculateHash(this.toString());
     }
 
     public void MerkleTree() throws NoSuchAlgorithmException {
@@ -73,15 +98,20 @@ public class Block {
             System.out.println("$$tempSize= " + tempSize);
             String newHash = null;
 
-            if ((i + 1) % 2 != 0 && i + 1 < tempSize) {
-                String newString = temp.get(i) + temp.get(i + 1);
-                newHash = calculateHash(newString);
-                System.out.println("newString= " + temp.get(i) + " | " + temp.get(i + 1));
-            } else {
-                String newString = temp.get(i) + temp.get(i);
-                newHash = calculateHash(newString);
-                System.out.println("newString= " + temp.get(i) + " | " + temp.get(i));
+            if (!temp.isEmpty()) {
+                if ((i + 1) % 2 != 0 && i + 1 < tempSize) {
+                    String newString = temp.get(i) + temp.get(i + 1);
+                    newHash = calculateHash(newString);
+                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i + 1));
+                } else {
+                    String newString = temp.get(i) + temp.get(i);
+                    newHash = calculateHash(newString);
+                    System.out.println("newString= " + temp.get(i) + " | " + temp.get(i));
+                }
+            }else{
+                break;
             }
+
             merkleTree.add(newHash);
             temp2.add(newHash);
             if (tempSize <= i + 2) {
@@ -96,13 +126,12 @@ public class Block {
         }
         System.out.println(merkleTree.toString());
     }
-    
-    private String getMerkleRoot(){
+
+    private String getMerkleRoot() {
         return merkleTree.last();
     }
-    
 
-    private String calculateHash(String string) throws NoSuchAlgorithmException {
+    public String calculateHash(String string) throws NoSuchAlgorithmException {
         //Call the SHA-256 Algorithm from MessageDigest
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         //Hash the transaction
@@ -113,8 +142,16 @@ public class Block {
         return transaction_Hash;
     }
 
+    public Header getHeader() {
+        return header;
+    }
+
     public String getBlockHash() {
         return blockHash;
+    }
+
+    public void setBlockHash(String blockHash) {
+        this.blockHash = blockHash;
     }
 
     @Override
