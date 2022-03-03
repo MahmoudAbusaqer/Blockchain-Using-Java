@@ -124,7 +124,7 @@ public class Block {
 
     @Override
     public String toString() {
-        return "Block{" + "index= " + index + ", header=" + header + ", transactionCounter=" + transactionCounter + ", transactions=" + transactions + '}';
+        return "Block{" + "index=" + index + ", header=" + header + ", transactionCounter=" + transactionCounter + ", transactions=" + transactions + '}';
     }
 
 }

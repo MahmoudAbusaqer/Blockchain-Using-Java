@@ -43,9 +43,7 @@ public class Mempool {
     //To store some transactions in the block
     public Set<Transaction> getUnconfirmedTransactions() {
         Queue<Transaction> tempMempoolStorage = null ;
-//        if (mempoolStorage.isEmpty()) {
             tempMempoolStorage = mempoolStorage.clone();
-//        }
         
         Set<Transaction> set = new HashSet<>();
         //Future development can increase the number of iterations due to a large number of transactions
@@ -62,5 +60,9 @@ public class Mempool {
     //Print all unconfirmed transactions
     public void printAllUnconfirmedTransactions() {
         this.mempoolStorage.iterator().toString();
+    }
+    
+    public int getSize(){
+        return this.mempoolStorage.size();
     }
 }

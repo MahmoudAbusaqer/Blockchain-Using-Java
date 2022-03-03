@@ -20,7 +20,6 @@ public class Header {
 //            this.merkleRoot = getMerkleRoot();
         this.timestamp = System.currentTimeMillis();
         this.difficulty = difficulty;//need to add the formula
-//            this.nonce = 0;
     }
 
     @Override

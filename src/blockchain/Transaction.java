@@ -18,7 +18,6 @@ public class Transaction {
     public Transaction(String transaction) throws NoSuchAlgorithmException {
         this.transaction = transaction;
         this.transactionHash = calculateHash(transaction);
-//        mempool = Mempool.getInstance();
         this.mempool.addToMempool(this);
     }
 
