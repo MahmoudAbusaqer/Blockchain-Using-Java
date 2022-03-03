@@ -18,8 +18,6 @@ public class Block {
 
     private TreeSet<String> merkleTree;
 
-    
-
     private int index;
     private Header header;
     private int transactionCounter;
@@ -30,14 +28,8 @@ public class Block {
         this.index = index;
         this.transactions = new ArrayList<>(transactions);
         this.transactionCounter = this.transactions.size();
-//        System.out.println("before the call of the merkle tree");
-//        MerkleTree();
-
         this.header = header;
-//        System.out.println("** after the call header object");
-//        System.out.println(this.header.toString());
-//        this.header.setMerkleRoot(getMerkleRoot());
-//        blockHash = calculateHash(this.toString());
+        setMerkleRoot();
     }
 
     public void MerkleTree() throws NoSuchAlgorithmException {
@@ -81,18 +73,13 @@ public class Block {
                 i += 2;
             }
         }
-//        System.out.println(merkleTree.toString());
-
+//        System.out.println("merkleTree= " +merkleTree.toString());
+//        System.out.println("merkleTree last= "+merkleTree.last());
     }
 
-    public void setMerkleRoot() {
+    public void setMerkleRoot() throws NoSuchAlgorithmException {
+        MerkleTree();
         this.header.setMerkleRoot(merkleTree.last());
-//        if (merkleTree.last() != null) {
-//            return merkleTree.last();
-//        } else {
-//            return "";
-//        }
-
     }
 
     public String calculateHash(String string) throws NoSuchAlgorithmException {

@@ -13,12 +13,13 @@ public class Main {
      */
     public static void main(String[] args) throws NoSuchAlgorithmException {
         Blockchain blockchain = new Blockchain();
-        blockchain.addTransaction(new Transaction("s1"));
-        blockchain.addTransaction(new Transaction("s2"));
-        blockchain.addTransaction(new Transaction("s3"));
-        blockchain.addTransaction(new Transaction("s4"));
-        blockchain.addTransaction(new Transaction("s5"));
-        blockchain.addTransaction(new Transaction("s6"));
+        blockchain.addTransaction(new Transaction("Transaction 1"));
+        blockchain.addTransaction(new Transaction("Transaction 2"));
+        blockchain.addTransaction(new Transaction("Transaction 3"));
+        blockchain.addTransaction(new Transaction("Transaction 4"));
+        blockchain.addTransaction(new Transaction("Transaction 5"));
+        blockchain.addTransaction(new Transaction("Transaction 6"));
+        blockchain.mineBlock();
         blockchain.mineBlock();
         blockchain.mineBlock();
         blockchain.blockExplorer();

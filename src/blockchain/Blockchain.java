@@ -15,7 +15,6 @@ public class Blockchain {
     private int difficulty = 2;
 
     public Blockchain() throws NoSuchAlgorithmException {
-        System.out.println("mempool size = " + mempool.getSize());
         createGenesisBlock();
     }
 
@@ -64,7 +63,7 @@ public class Blockchain {
 
     //Mining a new block
     public boolean mineBlock() throws NoSuchAlgorithmException {
-        if (mempool.getUnconfirmedTransactions().isEmpty() && chain.isEmpty()) {
+        if ((mempool.getUnconfirmedTransactions().isEmpty() && chain.isEmpty()) || mempool.getUnconfirmedTransactions().isEmpty()) {
             return false;
         }
 //        System.out.println("mempool size = " + mempool.getSize());
