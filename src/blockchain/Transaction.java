@@ -42,7 +42,7 @@ public class Transaction {
 
     @Override
     public String toString() {
-        return "Transaction{" + "transaction=" + transaction + ", transactionHash=" + transactionHash + '}';
+        return "Transaction{\n\t" + "transaction = " + transaction + ",\n\ttransactionHash = " + transactionHash + "}\n";
     }
 
 }

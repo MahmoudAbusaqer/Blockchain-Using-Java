@@ -1,5 +1,11 @@
 package blockchain;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +20,7 @@ public class Blockchain {
     private List<Block> chain = new LinkedList<>();
     private int difficulty = 2;
 
-    public Blockchain() throws NoSuchAlgorithmException {
+    public Blockchain() throws NoSuchAlgorithmException, IOException {
         createGenesisBlock();
     }
 
@@ -35,7 +41,7 @@ public class Blockchain {
             return false;
         }
         block.setBlockHash(powHash);
-        z("added to chain:::::" + this.chain.add(block));
+        print("Block added to chain = " + this.chain.add(block));
         return true;
     }
 
@@ -53,21 +59,15 @@ public class Blockchain {
         return computBlockHash;
     }
 
-    public void y(Block block) {
-        System.out.println("block= " + block.toString());
-    }
-
-    public void z(String s) {
-        System.out.println(s);
+    public void print(String string) {
+        System.out.println(string);
     }
 
     //Mining a new block
-    public boolean mineBlock() throws NoSuchAlgorithmException {
+    public boolean mineBlock() throws NoSuchAlgorithmException, IOException {
         if ((mempool.getUnconfirmedTransactions().isEmpty() && chain.isEmpty()) || mempool.getUnconfirmedTransactions().isEmpty()) {
             return false;
         }
-//        System.out.println("mempool size = " + mempool.getSize());
-//        System.out.println("mempool: " + mempool.getUnconfirmedTransactions().toString());
         Block block = null;
         if (chain.isEmpty()) {
             Header header = new Header(1, "0", this.difficulty);
@@ -81,6 +81,7 @@ public class Blockchain {
         String pow = proofOfWork(block);
         block.setBlockHash(pow);
         addToChain(block, pow);
+        writeToFile(block);
         mempool.removeAllFromMempool(block.getTransactions());
         return true;
     }
@@ -111,8 +112,20 @@ public class Blockchain {
     }
 
     //Create the first block in the blockchain
-    private void createGenesisBlock() throws NoSuchAlgorithmException {
+    private void createGenesisBlock() throws NoSuchAlgorithmException, IOException {
         addTransaction(new Transaction("Send 100 MAS coin to Mahmoud Abusaqer"));
         mineBlock();
+    }
+    
+    //Write the new generated block in a file for Central Blockchain Development
+    private void writeToFile(Block block) throws FileNotFoundException, IOException{
+        File file = new File("Blockchain.txt");
+        FileOutputStream fos = new FileOutputStream(file, true);
+        OutputStreamWriter osw = new OutputStreamWriter(fos);
+        PrintWriter pr = new PrintWriter(osw);
+        pr.println(block);
+        osw.close();
+        pr.flush();
+        pr.close();
     }
 }

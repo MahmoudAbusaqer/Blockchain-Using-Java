@@ -17,14 +17,13 @@ public class Header {
     public Header(int version, String previousHash, int difficulty) {
         this.version = version;
         this.previousHash = previousHash;//need to be the last block hash
-//            this.merkleRoot = getMerkleRoot();
         this.timestamp = System.currentTimeMillis();
-        this.difficulty = difficulty;//need to add the formula
+        this.difficulty = difficulty;
     }
 
     @Override
     public String toString() {
-        return "Header{" + "version=" + version + ", previousHash=" + previousHash + ", merkleRoot=" + merkleRoot + ", timestamp=" + timestamp + ", difficulty=" + difficulty + ", nonce=" + nonce + '}';
+        return "Header{\n\t" + " Version = " + version + ",\n\t Previous Hash = " + previousHash + ",\n\t Merkle Root = " + merkleRoot + ",\n\t Timestamp = " + timestamp + ",\n\t Difficulty = " + difficulty + ",\n\t Nonce = " + nonce + "\n}";
     }
 
     public String getPreviousHash() {
