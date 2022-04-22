@@ -1,14 +1,19 @@
 package blockchain;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  *
@@ -17,7 +22,7 @@ import java.util.List;
 public class Blockchain {
 
     private Mempool mempool = Mempool.getInstance();
-    private List<Block> chain = new LinkedList<>();
+    private static List<Block> chain = new LinkedList<>();
     private int difficulty = 2;
 
     public Blockchain() throws NoSuchAlgorithmException, IOException {
@@ -127,5 +132,119 @@ public class Blockchain {
         osw.close();
         pr.flush();
         pr.close();
+    }
+    
+    public static void connectToClient() {
+        String msg;
+        Scanner inputStream = null;
+        PrintWriter outputStream = null;
+        ServerSocket serverSocket = null;
+        try {
+            // Wait for connection on port 6789
+            System.out.println("Server: Waiting for a connection.");
+            serverSocket = new ServerSocket(6789);
+            if (serverSocket.isBound()) {
+                System.out.println("Server: *Server is up*");
+            }
+            Socket socket = serverSocket.accept();
+
+            while (true) {
+                // Connection made, set up streams
+                inputStream = new Scanner(new InputStreamReader(socket.getInputStream()));
+                outputStream = new PrintWriter(new DataOutputStream(socket.getOutputStream()));
+                // Read a line from the client
+                msg = inputStream.next();
+//                System.out.println("Server: msg = " + msg);
+                // Output text to the client
+                switch (msg) {
+                    case "version":
+                        // send a verack msg to the client
+                        System.out.println("version");
+                        break;
+                    case "getaddr":
+                        // send all the nodes addresses to the client
+                        System.out.println("getaddr");
+                        break;
+                    case "addr":
+                        // store the address of the client to the nodes list
+                        System.out.println("addr");
+                        System.out.println("Client Address: " + socket.getLocalSocketAddress());
+                        break;
+                    case "getblocks":
+                        // send all the blocks to the client
+                        System.out.println("getblocks");
+                        outputStream.println(chain);
+                        break;
+                    case "getheders":
+                        // send all the headers to the client
+                        System.out.println("getheders");
+                        break;
+                    case "exit":
+                        // send all the headers to the client
+                        System.out.println("exit");
+                        break;
+                    default:
+                        // code block
+                        System.out.println("default");
+                }
+                outputStream.println("end");
+                outputStream.flush();
+            }
+
+        } catch (Exception e) {
+            // If any exception occurs, display it
+            System.out.println("Server: Error" + e);
+
+        }
+        inputStream.close();
+        outputStream.close();
+    }
+
+    public static void connectToServer() {
+        String msg;
+        Scanner inputStream = null;
+        PrintWriter outputStream = null;
+        try {
+            Socket clientSocket = new Socket("localhost", 6789);
+            if (clientSocket.isBound()) {
+                System.out.println("Client: *Connected succeed*");
+            }
+            Scanner userInput = new Scanner(System.in);
+            String input;
+            while (true) {
+
+                // Set up streams to send/receive data
+                inputStream = new Scanner(new InputStreamReader(clientSocket.getInputStream()));
+                outputStream = new PrintWriter(new DataOutputStream(clientSocket.getOutputStream()));
+
+                // Send message to the server
+                System.out.print("Client: ");
+                input = userInput.nextLine();
+                if (input.equals("exit")) {
+                    System.out.println("Client: **scoket closed**");
+                    clientSocket.close();
+                    userInput.close();
+                }
+//                System.out.println("Client: input = " + input);
+                outputStream.println(input);
+                outputStream.flush(); // Sends data to the stream
+                // Read everything from the server until no
+                // more lines and output it to the screen
+                while (inputStream.hasNextLine()) {
+                    msg = inputStream.nextLine();
+                    if (msg.equals("end")) {
+                        break;
+                    }
+
+                    System.out.println(msg);
+                }
+            }
+
+        } catch (Exception e) {
+            // If any exception occurs, display it
+            System.out.println("Client: Error " + e);
+        }
+        inputStream.close();
+        outputStream.close();
     }
 }
